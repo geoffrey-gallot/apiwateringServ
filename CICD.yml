@@ -1,0 +1,34 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Installer les dépendances
+      run: sudo apt-get install ...
+
+    - name: Construire l'application
+      run: make
+
+    - name: Copier l'application sur l'Orange PI
+      uses: actions/rsync@v0
+      with:
+        source: ./build
+        destination: root@orangepi:/home/user/app
+
+    - name: Démarrer l'application sur l'Orange PI
+      uses: ssh-actions/ssh@v2
+      with:
+        host: orangepi
+        user: user
+        command: sudo /home/user/app/start.sh
